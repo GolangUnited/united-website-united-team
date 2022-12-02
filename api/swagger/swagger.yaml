@@ -1,6 +1,6 @@
 basePath: /api/v1/
 definitions:
-  core.Course:
+  domain.Course:
     properties:
       description:
         type: string
@@ -9,14 +9,14 @@ definitions:
       title:
         type: string
     type: object
-  service.CreateCourseInput:
+  dto.CreateCourseInput:
     properties:
       description:
         type: string
       title:
         type: string
     type: object
-  service.GetUserInfoOutput:
+  dto.GetUserInfoOutput:
     properties:
       display_name:
         type: string
@@ -35,7 +35,7 @@ definitions:
           type: integer
         type: array
     type: object
-  service.LoginInput:
+  dto.LoginInput:
     properties:
       email:
         type: string
@@ -44,7 +44,7 @@ definitions:
       persistent:
         type: boolean
     type: object
-  service.SignupUserInput:
+  dto.SignupUserInput:
     properties:
       display_name:
         type: string
@@ -57,7 +57,7 @@ definitions:
       password:
         type: string
     type: object
-  service.UpdateUserInfoInput:
+  dto.UpdateUserInfoInput:
     properties:
       display_name:
         type: string
@@ -84,6 +84,15 @@ definitions:
       validation_errors:
         $ref: '#/definitions/validation.Errors'
     type: object
+  v1.PostUserLoginOutput:
+    properties:
+      access_token:
+        type: string
+      expires_in:
+        type: integer
+      user_id:
+        type: string
+    type: object
   validation.Errors:
     additionalProperties: {}
     type: object
@@ -105,14 +114,14 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/service.LoginInput'
+          $ref: '#/definitions/dto.LoginInput'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/service.LoginInput'
+            $ref: '#/definitions/v1.PostUserLoginOutput'
         "400":
           description: Bad Request
           schema:
@@ -124,21 +133,19 @@ paths:
     post:
       consumes:
       - application/json
-      description: Creates new user with the given detials
+      description: Creates new user with the given details
       parameters:
       - description: New user signup details
         in: body
         name: input
         required: true
         schema:
-          $ref: '#/definitions/service.SignupUserInput'
+          $ref: '#/definitions/dto.SignupUserInput'
       produces:
       - application/json
       responses:
         "200":
           description: OK
-          schema:
-            $ref: '#/definitions/service.LoginInput'
         "400":
           description: Bad Request
           schema:
@@ -161,7 +168,7 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/service.CreateCourseInput'
+          $ref: '#/definitions/dto.CreateCourseInput'
       produces:
       - application/json
       responses:
@@ -195,7 +202,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/core.Course'
+            $ref: '#/definitions/domain.Course'
         "400":
           description: Bad Request
           schema:
@@ -227,7 +234,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/service.GetUserInfoOutput'
+            $ref: '#/definitions/dto.GetUserInfoOutput'
         "401":
           description: Unauthorized
           schema:
@@ -254,7 +261,7 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/service.UpdateUserInfoInput'
+          $ref: '#/definitions/dto.UpdateUserInfoInput'
       produces:
       - application/json
       responses:

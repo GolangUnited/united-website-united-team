@@ -2,7 +2,7 @@
 
 .PHONY: swag
 swag:
-	swag init --parseDependency --dir internal/apiserver -g apiserver.go -o api/swagger
+	swag init --parseDependency --dir internal/app -g apiserver.go -o api/swagger
 
 .PHONY: build
 build:
@@ -12,3 +12,11 @@ build:
 gen:
 	go generate ./...
 
+test:
+	go test -v ./...
+
+.PHONY: cover
+cover:
+	go test -count=1 -coverprofile=coverage.out ./...
+	go tool cover -html=coverage.out
+	rm coverage.out

@@ -36,7 +36,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/service.LoginInput"
+                            "$ref": "#/definitions/dto.LoginInput"
                         }
                     }
                 ],
@@ -44,7 +44,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/service.LoginInput"
+                            "$ref": "#/definitions/v1.PostUserLoginOutput"
                         }
                     },
                     "400": {
@@ -58,7 +58,7 @@ const docTemplate = `{
         },
         "/auth/signup": {
             "post": {
-                "description": "Creates new user with the given detials",
+                "description": "Creates new user with the given details",
                 "consumes": [
                     "application/json"
                 ],
@@ -76,16 +76,13 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/service.SignupUserInput"
+                            "$ref": "#/definitions/dto.SignupUserInput"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/service.LoginInput"
-                        }
+                        "description": "OK"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -122,7 +119,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/service.CreateCourseInput"
+                            "$ref": "#/definitions/dto.CreateCourseInput"
                         }
                     }
                 ],
@@ -171,7 +168,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/core.Course"
+                            "$ref": "#/definitions/domain.Course"
                         }
                     },
                     "400": {
@@ -218,7 +215,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/service.GetUserInfoOutput"
+                            "$ref": "#/definitions/dto.GetUserInfoOutput"
                         }
                     },
                     "401": {
@@ -260,7 +257,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/service.UpdateUserInfoInput"
+                            "$ref": "#/definitions/dto.UpdateUserInfoInput"
                         }
                     }
                 ],
@@ -297,7 +294,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "core.Course": {
+        "domain.Course": {
             "type": "object",
             "properties": {
                 "description": {
@@ -311,7 +308,7 @@ const docTemplate = `{
                 }
             }
         },
-        "service.CreateCourseInput": {
+        "dto.CreateCourseInput": {
             "type": "object",
             "properties": {
                 "description": {
@@ -322,7 +319,7 @@ const docTemplate = `{
                 }
             }
         },
-        "service.GetUserInfoOutput": {
+        "dto.GetUserInfoOutput": {
             "type": "object",
             "properties": {
                 "display_name": {
@@ -351,7 +348,7 @@ const docTemplate = `{
                 }
             }
         },
-        "service.LoginInput": {
+        "dto.LoginInput": {
             "type": "object",
             "properties": {
                 "email": {
@@ -365,7 +362,7 @@ const docTemplate = `{
                 }
             }
         },
-        "service.SignupUserInput": {
+        "dto.SignupUserInput": {
             "type": "object",
             "properties": {
                 "display_name": {
@@ -385,7 +382,7 @@ const docTemplate = `{
                 }
             }
         },
-        "service.UpdateUserInfoInput": {
+        "dto.UpdateUserInfoInput": {
             "type": "object",
             "properties": {
                 "display_name": {
@@ -423,6 +420,20 @@ const docTemplate = `{
                 },
                 "validation_errors": {
                     "$ref": "#/definitions/validation.Errors"
+                }
+            }
+        },
+        "v1.PostUserLoginOutput": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "expires_in": {
+                    "type": "integer"
+                },
+                "user_id": {
+                    "type": "string"
                 }
             }
         },
