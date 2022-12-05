@@ -24,7 +24,7 @@ func (h *Handler) initUserRoutes(api *gin.RouterGroup) {
 // @ModuleID getUserInfo
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} dto.GetUserInfoOutput
+// @Success 200 {object} core.GetUserInfoOutput
 // @Failure 401,404,500 {object} utils.Response
 // @Router /user [get]
 func (h *Handler) getUserInfo(ctx *gin.Context) {
@@ -50,7 +50,7 @@ func (h *Handler) getUserInfo(ctx *gin.Context) {
 // @ModuleID updateUserInfo
 // @Accept  json
 // @Produce  json
-// @Param input body dto.UpdateUserInfoInput true "user info"
+// @Param input body core.UpdateUserInfoInput true "user info"
 // @Success 204
 // @Failure 400             {object} utils.ValidationError
 // @Failure 401,404,500     {object} utils.Response

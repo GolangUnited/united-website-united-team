@@ -23,7 +23,7 @@ func (h *Handler) initCoursesRoutes(api *gin.RouterGroup) {
 // @Accept  json
 // @Produce  json
 // @Param id path string true "course id"
-// @Success 200 {object} domain.Course
+// @Success 200 {object} core.Course
 // @Failure 400,404 {object} utils.Response
 // @Failure 500 {object} utils.Response
 // @Failure default {object} utils.Response
@@ -54,7 +54,7 @@ func (h *Handler) getCourseById(c *gin.Context) {
 // @ModuleID create
 // @Accept  json
 // @Produce  json
-// @Param input body dto.CreateCourseInput true "sign up info"
+// @Param input body core.CreateCourseInput true "sign up info"
 // @Success 201 "The generated id is returned in Location header"
 // @Failure 400 {object} utils.Response
 // @Failure 500 {object} utils.Response

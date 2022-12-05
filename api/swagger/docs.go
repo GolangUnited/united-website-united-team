@@ -36,7 +36,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.LoginInput"
+                            "$ref": "#/definitions/core.LoginInput"
                         }
                     }
                 ],
@@ -76,7 +76,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.SignupUserInput"
+                            "$ref": "#/definitions/core.SignupUserInput"
                         }
                     }
                 ],
@@ -119,7 +119,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.CreateCourseInput"
+                            "$ref": "#/definitions/core.CreateCourseInput"
                         }
                     }
                 ],
@@ -168,7 +168,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/domain.Course"
+                            "$ref": "#/definitions/core.Course"
                         }
                     },
                     "400": {
@@ -215,7 +215,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.GetUserInfoOutput"
+                            "$ref": "#/definitions/core.GetUserInfoOutput"
                         }
                     },
                     "401": {
@@ -257,7 +257,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.UpdateUserInfoInput"
+                            "$ref": "#/definitions/core.UpdateUserInfoInput"
                         }
                     }
                 ],
@@ -294,7 +294,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "domain.Course": {
+        "core.Course": {
             "type": "object",
             "properties": {
                 "description": {
@@ -308,7 +308,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.CreateCourseInput": {
+        "core.CreateCourseInput": {
             "type": "object",
             "properties": {
                 "description": {
@@ -319,7 +319,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.GetUserInfoOutput": {
+        "core.GetUserInfoOutput": {
             "type": "object",
             "properties": {
                 "display_name": {
@@ -348,7 +348,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.LoginInput": {
+        "core.LoginInput": {
             "type": "object",
             "properties": {
                 "email": {
@@ -362,7 +362,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.SignupUserInput": {
+        "core.SignupUserInput": {
             "type": "object",
             "properties": {
                 "display_name": {
@@ -382,7 +382,7 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.UpdateUserInfoInput": {
+        "core.UpdateUserInfoInput": {
             "type": "object",
             "properties": {
                 "display_name": {

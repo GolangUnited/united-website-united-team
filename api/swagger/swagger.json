@@ -29,7 +29,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.LoginInput"
+                            "$ref": "#/definitions/core.LoginInput"
                         }
                     }
                 ],
@@ -69,7 +69,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.SignupUserInput"
+                            "$ref": "#/definitions/core.SignupUserInput"
                         }
                     }
                 ],
@@ -112,7 +112,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.CreateCourseInput"
+                            "$ref": "#/definitions/core.CreateCourseInput"
                         }
                     }
                 ],
@@ -161,7 +161,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/domain.Course"
+                            "$ref": "#/definitions/core.Course"
                         }
                     },
                     "400": {
@@ -208,7 +208,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.GetUserInfoOutput"
+                            "$ref": "#/definitions/core.GetUserInfoOutput"
                         }
                     },
                     "401": {
@@ -250,7 +250,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.UpdateUserInfoInput"
+                            "$ref": "#/definitions/core.UpdateUserInfoInput"
                         }
                     }
                 ],
@@ -287,7 +287,7 @@
         }
     },
     "definitions": {
-        "domain.Course": {
+        "core.Course": {
             "type": "object",
             "properties": {
                 "description": {
@@ -301,7 +301,7 @@
                 }
             }
         },
-        "dto.CreateCourseInput": {
+        "core.CreateCourseInput": {
             "type": "object",
             "properties": {
                 "description": {
@@ -312,7 +312,7 @@
                 }
             }
         },
-        "dto.GetUserInfoOutput": {
+        "core.GetUserInfoOutput": {
             "type": "object",
             "properties": {
                 "display_name": {
@@ -341,7 +341,7 @@
                 }
             }
         },
-        "dto.LoginInput": {
+        "core.LoginInput": {
             "type": "object",
             "properties": {
                 "email": {
@@ -355,7 +355,7 @@
                 }
             }
         },
-        "dto.SignupUserInput": {
+        "core.SignupUserInput": {
             "type": "object",
             "properties": {
                 "display_name": {
@@ -375,7 +375,7 @@
                 }
             }
         },
-        "dto.UpdateUserInfoInput": {
+        "core.UpdateUserInfoInput": {
             "type": "object",
             "properties": {
                 "display_name": {

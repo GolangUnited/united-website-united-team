@@ -1,6 +1,6 @@
 basePath: /api/v1/
 definitions:
-  domain.Course:
+  core.Course:
     properties:
       description:
         type: string
@@ -9,14 +9,14 @@ definitions:
       title:
         type: string
     type: object
-  dto.CreateCourseInput:
+  core.CreateCourseInput:
     properties:
       description:
         type: string
       title:
         type: string
     type: object
-  dto.GetUserInfoOutput:
+  core.GetUserInfoOutput:
     properties:
       display_name:
         type: string
@@ -35,7 +35,7 @@ definitions:
           type: integer
         type: array
     type: object
-  dto.LoginInput:
+  core.LoginInput:
     properties:
       email:
         type: string
@@ -44,7 +44,7 @@ definitions:
       persistent:
         type: boolean
     type: object
-  dto.SignupUserInput:
+  core.SignupUserInput:
     properties:
       display_name:
         type: string
@@ -57,7 +57,7 @@ definitions:
       password:
         type: string
     type: object
-  dto.UpdateUserInfoInput:
+  core.UpdateUserInfoInput:
     properties:
       display_name:
         type: string
@@ -114,7 +114,7 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/dto.LoginInput'
+          $ref: '#/definitions/core.LoginInput'
       produces:
       - application/json
       responses:
@@ -140,7 +140,7 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/dto.SignupUserInput'
+          $ref: '#/definitions/core.SignupUserInput'
       produces:
       - application/json
       responses:
@@ -168,7 +168,7 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/dto.CreateCourseInput'
+          $ref: '#/definitions/core.CreateCourseInput'
       produces:
       - application/json
       responses:
@@ -202,7 +202,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/domain.Course'
+            $ref: '#/definitions/core.Course'
         "400":
           description: Bad Request
           schema:
@@ -234,7 +234,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.GetUserInfoOutput'
+            $ref: '#/definitions/core.GetUserInfoOutput'
         "401":
           description: Unauthorized
           schema:
@@ -261,7 +261,7 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/dto.UpdateUserInfoInput'
+          $ref: '#/definitions/core.UpdateUserInfoInput'
       produces:
       - application/json
       responses:
