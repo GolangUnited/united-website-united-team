@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/zhuravlev-pe/course-watch/internal/adapter/http/v1/utils"
-	"github.com/zhuravlev-pe/course-watch/internal/core/domain"
+	"github.com/zhuravlev-pe/course-watch/internal/core"
 	"net/http"
 )
 
@@ -18,7 +18,7 @@ func (h *Handler) parseRequestBody(ctx *gin.Context, input interface{}) bool {
 }
 
 func (h *Handler) handleServiceError(ctx *gin.Context, err error) {
-	if err == domain.ErrNotFound {
+	if err == core.ErrNotFound {
 		utils.ErrorResponse(ctx, http.StatusNotFound, err)
 		return
 	}

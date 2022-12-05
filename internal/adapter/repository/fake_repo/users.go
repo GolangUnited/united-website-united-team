@@ -3,35 +3,34 @@ package fake_repo
 import (
 	"context"
 	"errors"
-	"github.com/zhuravlev-pe/course-watch/internal/core/domain"
-	"github.com/zhuravlev-pe/course-watch/internal/core/dto"
+	"github.com/zhuravlev-pe/course-watch/internal/core"
 	"github.com/zhuravlev-pe/course-watch/internal/core/service"
 )
 
 type users struct {
-	byIds   map[string]*domain.User
-	byEmail map[string]*domain.User
+	byIds   map[string]*core.User
+	byEmail map[string]*core.User
 }
 
 func newUsers() service.UsersRepository {
 	return &users{
-		byIds:   map[string]*domain.User{},
-		byEmail: map[string]*domain.User{},
+		byIds:   map[string]*core.User{},
+		byEmail: map[string]*core.User{},
 	}
 }
 
-func (u *users) GetById(ctx context.Context, id string) (*domain.User, error) {
+func (u *users) GetById(ctx context.Context, id string) (*core.User, error) {
 	if ctx.Err() != nil {
 		return nil, ctx.Err()
 	}
 	user, ok := u.byIds[id]
 	if !ok {
-		return nil, domain.ErrNotFound
+		return nil, core.ErrNotFound
 	}
 	return user, nil
 }
 
-func (u *users) Insert(ctx context.Context, user *domain.User) error {
+func (u *users) Insert(ctx context.Context, user *core.User) error {
 	if ctx.Err() != nil {
 		return ctx.Err()
 	}
@@ -44,13 +43,13 @@ func (u *users) Insert(ctx context.Context, user *domain.User) error {
 	return nil
 }
 
-func (u *users) Update(ctx context.Context, id string, input *dto.UpdateUserInfoInput) error {
+func (u *users) Update(ctx context.Context, id string, input *core.UpdateUserInfoInput) error {
 	if ctx.Err() != nil {
 		return ctx.Err()
 	}
 	user, ok := u.byIds[id]
 	if !ok {
-		return domain.ErrNotFound
+		return core.ErrNotFound
 	}
 	user.FirstName = input.FirstName
 	user.LastName = input.LastName
@@ -58,13 +57,13 @@ func (u *users) Update(ctx context.Context, id string, input *dto.UpdateUserInfo
 	return nil
 }
 
-func (u *users) GetByEmail(ctx context.Context, email string) (*domain.User, error) {
+func (u *users) GetByEmail(ctx context.Context, email string) (*core.User, error) {
 	if ctx.Err() != nil {
 		return nil, ctx.Err()
 	}
 	user, ok := u.byEmail[email]
 	if !ok {
-		return nil, domain.ErrNotFound
+		return nil, core.ErrNotFound
 	}
 	return user, nil
 }

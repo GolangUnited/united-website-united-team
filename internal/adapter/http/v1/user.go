@@ -2,7 +2,7 @@ package v1
 
 import (
 	"fmt"
-	"github.com/zhuravlev-pe/course-watch/internal/core/dto"
+	"github.com/zhuravlev-pe/course-watch/internal/core"
 	"net/http"
 	
 	"github.com/gin-gonic/gin"
@@ -62,7 +62,7 @@ func (h *Handler) updateUserInfo(ctx *gin.Context) {
 		utils.ErrorResponseMessageOverride(ctx, http.StatusInternalServerError, err, "user data processing failure")
 		return
 	}
-	var input dto.UpdateUserInfoInput
+	var input core.UpdateUserInfoInput
 	if !h.parseRequestBody(ctx, &input) {
 		return
 	}

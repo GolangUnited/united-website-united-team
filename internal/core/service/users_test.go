@@ -7,8 +7,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/zhuravlev-pe/course-watch/internal/core/domain"
-	"github.com/zhuravlev-pe/course-watch/internal/core/dto"
+	"github.com/zhuravlev-pe/course-watch/internal/core"
 	repoMocks "github.com/zhuravlev-pe/course-watch/internal/core/service/mocks"
 	"github.com/zhuravlev-pe/course-watch/pkg/idgen"
 	"github.com/zhuravlev-pe/course-watch/pkg/security"
@@ -27,13 +26,13 @@ func TestUsersService_GetUserInfo(t *testing.T) {
 	cases := map[string]struct {
 		id         string
 		setupMocks func(context.Context, *repoMocks.MockUsersRepository)
-		output     *dto.GetUserInfoOutput
+		output     *core.GetUserInfoOutput
 		checkError func(*testing.T, error)
 	}{
 		"success": {
 			id: "1111111",
 			setupMocks: func(ctx context.Context, mockUsersRepo *repoMocks.MockUsersRepository) {
-				u := &domain.User{
+				u := &core.User{
 					Id:               "1111111",
 					Email:            "doe.h@example.com",
 					FirstName:        "John",
@@ -44,7 +43,7 @@ func TestUsersService_GetUserInfo(t *testing.T) {
 				}
 				mockUsersRepo.EXPECT().GetById(ctx, "1111111").Return(u, nil).Times(1)
 			},
-			output: &dto.GetUserInfoOutput{
+			output: &core.GetUserInfoOutput{
 				Id:               "1111111",
 				Email:            "doe.h@example.com",
 				FirstName:        "John",
@@ -58,11 +57,11 @@ func TestUsersService_GetUserInfo(t *testing.T) {
 		"not_found": {
 			id: "1111111",
 			setupMocks: func(ctx context.Context, mockUsersRepo *repoMocks.MockUsersRepository) {
-				mockUsersRepo.EXPECT().GetById(ctx, "1111111").Return(nil, domain.ErrNotFound).Times(1)
+				mockUsersRepo.EXPECT().GetById(ctx, "1111111").Return(nil, core.ErrNotFound).Times(1)
 			},
 			output: nil,
 			checkError: func(t *testing.T, err error) {
-				assert.ErrorIs(t, err, domain.ErrNotFound)
+				assert.ErrorIs(t, err, core.ErrNotFound)
 			},
 		},
 		"db_error": {
@@ -98,20 +97,20 @@ func TestUsersService_GetUserInfo(t *testing.T) {
 func TestUsersService_UpdateUserInfo(t *testing.T) {
 	cases := map[string]struct {
 		id         string
-		input      *dto.UpdateUserInfoInput
+		input      *core.UpdateUserInfoInput
 		setupMocks func(context.Context, *repoMocks.MockUsersRepository)
 		checkError func(*testing.T, error)
 	}{
 		"success": {
 			id: "1111111",
-			input: &dto.UpdateUserInfoInput{
+			input: &core.UpdateUserInfoInput{
 				FirstName:   "John",
 				LastName:    "Doe",
 				DisplayName: "JohnnyD",
 			},
 			setupMocks: func(ctx context.Context, mockUsersRepo *repoMocks.MockUsersRepository) {
 				mockUsersRepo.EXPECT().GetById(ctx, "1111111").Return(nil, nil).Times(1)
-				var upd dto.UpdateUserInfoInput
+				var upd core.UpdateUserInfoInput
 				upd.FirstName = "John"
 				upd.LastName = "Doe"
 				upd.DisplayName = "JohnnyD"
@@ -121,21 +120,21 @@ func TestUsersService_UpdateUserInfo(t *testing.T) {
 		},
 		"not_found": {
 			id: "1111111",
-			input: &dto.UpdateUserInfoInput{
+			input: &core.UpdateUserInfoInput{
 				FirstName:   "John",
 				LastName:    "Doe",
 				DisplayName: "JohnnyD",
 			},
 			setupMocks: func(ctx context.Context, mockUsersRepo *repoMocks.MockUsersRepository) {
-				mockUsersRepo.EXPECT().GetById(ctx, "1111111").Return(nil, domain.ErrNotFound).Times(1)
+				mockUsersRepo.EXPECT().GetById(ctx, "1111111").Return(nil, core.ErrNotFound).Times(1)
 			},
 			checkError: func(t *testing.T, err error) {
-				assert.ErrorIs(t, err, domain.ErrNotFound)
+				assert.ErrorIs(t, err, core.ErrNotFound)
 			},
 		},
 		"db_error_on_get": {
 			id: "1111111",
-			input: &dto.UpdateUserInfoInput{
+			input: &core.UpdateUserInfoInput{
 				FirstName:   "John",
 				LastName:    "Doe",
 				DisplayName: "JohnnyD",
@@ -149,14 +148,14 @@ func TestUsersService_UpdateUserInfo(t *testing.T) {
 		},
 		"db_error_on_update": {
 			id: "1111111",
-			input: &dto.UpdateUserInfoInput{
+			input: &core.UpdateUserInfoInput{
 				FirstName:   "John",
 				LastName:    "Doe",
 				DisplayName: "JohnnyD",
 			},
 			setupMocks: func(ctx context.Context, mockUsersRepo *repoMocks.MockUsersRepository) {
 				mockUsersRepo.EXPECT().GetById(ctx, "1111111").Return(nil, nil).Times(1)
-				var upd dto.UpdateUserInfoInput
+				var upd core.UpdateUserInfoInput
 				upd.FirstName = "John"
 				upd.LastName = "Doe"
 				upd.DisplayName = "JohnnyD"
@@ -168,7 +167,7 @@ func TestUsersService_UpdateUserInfo(t *testing.T) {
 		},
 		"validation_firstName_required": {
 			id: "1111111",
-			input: &dto.UpdateUserInfoInput{
+			input: &core.UpdateUserInfoInput{
 				LastName: "Doe",
 			},
 			setupMocks: func(ctx context.Context, mockUsersRepo *repoMocks.MockUsersRepository) {},
@@ -183,7 +182,7 @@ func TestUsersService_UpdateUserInfo(t *testing.T) {
 		},
 		"validation_lastName_required": {
 			id: "1111111",
-			input: &dto.UpdateUserInfoInput{
+			input: &core.UpdateUserInfoInput{
 				FirstName: "John",
 			},
 			setupMocks: func(ctx context.Context, mockUsersRepo *repoMocks.MockUsersRepository) {},

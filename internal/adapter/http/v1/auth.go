@@ -1,8 +1,7 @@
 package v1
 
 import (
-	"github.com/zhuravlev-pe/course-watch/internal/core/domain"
-	"github.com/zhuravlev-pe/course-watch/internal/core/dto"
+	"github.com/zhuravlev-pe/course-watch/internal/core"
 	"net/http"
 	
 	"github.com/gin-gonic/gin"
@@ -29,7 +28,7 @@ func (h *Handler) initAuthRoutes(api *gin.RouterGroup) {
 // @Failure 400,500 {object} utils.Response
 // @Router /auth/signup [Post]
 func (h *Handler) signupNewUser(ctx *gin.Context) {
-	var input dto.SignupUserInput
+	var input core.SignupUserInput
 	if err := ctx.BindJSON(&input); err != nil {
 		utils.ErrorResponseString(ctx, http.StatusBadRequest, "invalid input body")
 		return
@@ -37,7 +36,7 @@ func (h *Handler) signupNewUser(ctx *gin.Context) {
 	err := h.services.Users.Signup(ctx.Request.Context(), &input)
 	
 	if err != nil {
-		if err == domain.ErrUserAlreadyExist {
+		if err == core.ErrUserAlreadyExist {
 			utils.ErrorResponse(ctx, http.StatusBadRequest, err)
 			return
 		}
@@ -59,7 +58,7 @@ func (h *Handler) signupNewUser(ctx *gin.Context) {
 // @Failure 400 {object} utils.Response
 // @Router /auth/login [Post]
 func (h *Handler) userLogin(ctx *gin.Context) {
-	var input dto.LoginInput
+	var input core.LoginInput
 	if err := ctx.BindJSON(&input); err != nil {
 		utils.ErrorResponseString(ctx, http.StatusBadRequest, "invalid input body")
 		return
@@ -67,7 +66,7 @@ func (h *Handler) userLogin(ctx *gin.Context) {
 	result, err := h.services.Users.Login(ctx.Request.Context(), &input)
 	
 	if err != nil {
-		if err == domain.ErrInvalidCredentials {
+		if err == core.ErrInvalidCredentials {
 			utils.ErrorResponse(ctx, http.StatusBadRequest, err)
 			return
 		}

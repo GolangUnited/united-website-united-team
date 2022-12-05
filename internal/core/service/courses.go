@@ -2,28 +2,27 @@ package service
 
 import (
 	"context"
-	"github.com/zhuravlev-pe/course-watch/internal/core/domain"
-	"github.com/zhuravlev-pe/course-watch/internal/core/dto"
+	"github.com/zhuravlev-pe/course-watch/internal/core"
 )
 
-type CoursesService struct {
+type CourseService struct {
 	repo  CoursesRepository
-	idGen IDGenerator
+	idGen IdGenerator
 }
 
-func NewCoursesService(repo CoursesRepository, idGen IDGenerator) *CoursesService {
-	return &CoursesService{
+func NewCoursesService(repo CoursesRepository, idGen IdGenerator) *CourseService {
+	return &CourseService{
 		repo:  repo,
 		idGen: idGen,
 	}
 }
 
-func (s *CoursesService) GetById(ctx context.Context, id string) (*domain.Course, error) {
+func (s *CourseService) GetById(ctx context.Context, id string) (*core.Course, error) {
 	return s.repo.GetById(ctx, id)
 }
 
-func (s *CoursesService) Create(ctx context.Context, input dto.CreateCourseInput) (*domain.Course, error) {
-	course := &domain.Course{
+func (s *CourseService) Create(ctx context.Context, input core.CreateCourseInput) (*core.Course, error) {
+	course := &core.Course{
 		Id:          s.idGen.Generate(),
 		Title:       input.Title,
 		Description: input.Description,

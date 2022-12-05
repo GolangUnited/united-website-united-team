@@ -3,8 +3,7 @@ package v1
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/zhuravlev-pe/course-watch/internal/adapter/http/v1/utils"
-	"github.com/zhuravlev-pe/course-watch/internal/core/domain"
-	"github.com/zhuravlev-pe/course-watch/internal/core/dto"
+	"github.com/zhuravlev-pe/course-watch/internal/core"
 	"net/http"
 )
 
@@ -38,7 +37,7 @@ func (h *Handler) getCourseById(c *gin.Context) {
 	
 	course, err := h.services.Courses.GetById(c.Request.Context(), id)
 	if err != nil {
-		if err == domain.ErrNotFound {
+		if err == core.ErrNotFound {
 			utils.ErrorResponse(c, http.StatusNotFound, err)
 			return
 		}
@@ -61,7 +60,7 @@ func (h *Handler) getCourseById(c *gin.Context) {
 // @Failure 500 {object} utils.Response
 // @Router /courses/ [post]
 func (h *Handler) create(c *gin.Context) {
-	var input dto.CreateCourseInput
+	var input core.CreateCourseInput
 	if err := c.BindJSON(&input); err != nil {
 		utils.ErrorResponseString(c, http.StatusBadRequest, "invalid input body")
 		return

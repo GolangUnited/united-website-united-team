@@ -2,7 +2,7 @@ package fake_repo
 
 import (
 	"context"
-	"github.com/zhuravlev-pe/course-watch/internal/core/domain"
+	"github.com/zhuravlev-pe/course-watch/internal/core"
 	"github.com/zhuravlev-pe/course-watch/internal/core/service"
 	"github.com/zhuravlev-pe/course-watch/pkg/security"
 	"time"
@@ -22,7 +22,7 @@ func New() *service.Repositories {
 	return result
 }
 
-var SampleUser = domain.User{
+var SampleUser = core.User{
 	Id:               "1582550893222432768",
 	Email:            "doe.j@example.com",
 	FirstName:        "John",

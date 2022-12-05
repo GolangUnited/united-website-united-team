@@ -5,8 +5,7 @@ import (
 	"errors"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/zhuravlev-pe/course-watch/internal/core/domain"
-	"github.com/zhuravlev-pe/course-watch/internal/core/dto"
+	"github.com/zhuravlev-pe/course-watch/internal/core"
 	"github.com/zhuravlev-pe/course-watch/pkg/security"
 )
 
@@ -18,7 +17,7 @@ func NewUsersRepo(client *pgxpool.Pool) *UsersRepo {
 	return &UsersRepo{client: client}
 }
 
-func (u *UsersRepo) Insert(ctx context.Context, user *domain.User) error {
+func (u *UsersRepo) Insert(ctx context.Context, user *core.User) error {
 	query := `
 		INSERT INTO public.users
 		    (id, email, firstname, lastname, display_name,
@@ -33,7 +32,7 @@ func (u *UsersRepo) Insert(ctx context.Context, user *domain.User) error {
 	return err
 }
 
-func (u *UsersRepo) Update(ctx context.Context, id string, input *dto.UpdateUserInfoInput) error {
+func (u *UsersRepo) Update(ctx context.Context, id string, input *core.UpdateUserInfoInput) error {
 	query := `
 		UPDATE public.users
 		  SET (firstname, lastname, display_name) = ($1, $2, $3)
@@ -47,7 +46,7 @@ func (u *UsersRepo) Update(ctx context.Context, id string, input *dto.UpdateUser
 	return nil
 }
 
-func (u *UsersRepo) GetById(ctx context.Context, id string) (*domain.User, error) {
+func (u *UsersRepo) GetById(ctx context.Context, id string) (*core.User, error) {
 	query := `
 		SELECT id, email, firstname, lastname, display_name,
 		       registration_date, hashed_password, roles
@@ -58,7 +57,7 @@ func (u *UsersRepo) GetById(ctx context.Context, id string) (*domain.User, error
 	return u.getByField(ctx, query, id)
 }
 
-func (u *UsersRepo) GetByEmail(ctx context.Context, email string) (*domain.User, error) {
+func (u *UsersRepo) GetByEmail(ctx context.Context, email string) (*core.User, error) {
 	query := `
 		SELECT id, email, firstname, lastname, display_name,
 		       registration_date, hashed_password, roles
@@ -69,8 +68,8 @@ func (u *UsersRepo) GetByEmail(ctx context.Context, email string) (*domain.User,
 	return u.getByField(ctx, query, email)
 }
 
-func (u *UsersRepo) getByField(ctx context.Context, query string, field string) (*domain.User, error) {
-	var user domain.User
+func (u *UsersRepo) getByField(ctx context.Context, query string, field string) (*core.User, error) {
+	var user core.User
 	var r []uint8
 	
 	//TODO to think of a better way of scanning/storing []Role
@@ -87,7 +86,7 @@ func (u *UsersRepo) getByField(ctx context.Context, query string, field string) 
 	
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, domain.ErrNotFound
+			return nil, core.ErrNotFound
 		}
 		return nil, err
 	}

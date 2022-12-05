@@ -2,34 +2,33 @@ package service
 
 import (
 	"context"
-	"github.com/zhuravlev-pe/course-watch/internal/core/domain"
-	"github.com/zhuravlev-pe/course-watch/internal/core/dto"
+	"github.com/zhuravlev-pe/course-watch/internal/core"
 	"time"
 	
 	"github.com/zhuravlev-pe/course-watch/pkg/security"
 	"golang.org/x/crypto/bcrypt"
 )
 
-type usersService struct {
+type UserService struct {
 	repo  UsersRepository
-	idGen IDGenerator
+	idGen IdGenerator
 }
 
-func NewUsersService(repo UsersRepository, idGen IDGenerator) Users {
-	return &usersService{
+func NewUsersService(repo UsersRepository, idGen IdGenerator) *UserService {
+	return &UserService{
 		repo:  repo,
 		idGen: idGen,
 	}
 }
 
-func (u *usersService) GetUserInfo(ctx context.Context, id string) (*dto.GetUserInfoOutput, error) {
+func (u *UserService) GetUserInfo(ctx context.Context, id string) (*core.GetUserInfoOutput, error) {
 	
 	user, err := u.repo.GetById(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 	
-	result := dto.GetUserInfoOutput{
+	result := core.GetUserInfoOutput{
 		Id:               user.Id,
 		Email:            user.Email,
 		FirstName:        user.FirstName,
@@ -41,7 +40,7 @@ func (u *usersService) GetUserInfo(ctx context.Context, id string) (*dto.GetUser
 	return &result, nil
 }
 
-func (u *usersService) UpdateUserInfo(ctx context.Context, id string, input *dto.UpdateUserInfoInput) error {
+func (u *UserService) UpdateUserInfo(ctx context.Context, id string, input *core.UpdateUserInfoInput) error {
 	
 	if err := input.Validate(); err != nil {
 		return err
@@ -52,7 +51,7 @@ func (u *usersService) UpdateUserInfo(ctx context.Context, id string, input *dto
 		return err
 	}
 	
-	upd := dto.UpdateUserInfoInput{
+	upd := core.UpdateUserInfoInput{
 		FirstName:   input.FirstName,
 		LastName:    input.LastName,
 		DisplayName: input.DisplayName,
@@ -60,16 +59,16 @@ func (u *usersService) UpdateUserInfo(ctx context.Context, id string, input *dto
 	return u.repo.Update(ctx, id, &upd)
 }
 
-func (u *usersService) Signup(ctx context.Context, input *dto.SignupUserInput) error {
+func (u *UserService) Signup(ctx context.Context, input *core.SignupUserInput) error {
 	
 	user, err := u.repo.GetByEmail(ctx, input.Email)
-	if err != nil && err != domain.ErrNotFound {
+	if err != nil && err != core.ErrNotFound {
 		//Any error other than ErrorNotFound should stop the Signup flow as ErrorNotFound is valid for the user Signup
 		return err
 	}
 	
 	if user != nil && user.Email == input.Email {
-		return domain.ErrUserAlreadyExist
+		return core.ErrUserAlreadyExist
 	}
 	
 	hashPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
@@ -77,7 +76,7 @@ func (u *usersService) Signup(ctx context.Context, input *dto.SignupUserInput) e
 		return err
 	}
 	
-	user = &domain.User{
+	user = &core.User{
 		Id:               u.idGen.Generate(),
 		Email:            input.Email,
 		FirstName:        input.FirstName,
@@ -94,19 +93,19 @@ func (u *usersService) Signup(ctx context.Context, input *dto.SignupUserInput) e
 	return nil
 }
 
-func (u *usersService) Login(ctx context.Context, input *dto.LoginInput) (*domain.User, error) {
+func (u *UserService) Login(ctx context.Context, input *core.LoginInput) (*core.User, error) {
 	
 	user, err := u.repo.GetByEmail(ctx, input.Email)
-	if err != nil && err != domain.ErrNotFound {
+	if err != nil && err != core.ErrNotFound {
 		return nil, err
 	}
 	
-	if err == domain.ErrNotFound {
-		return nil, domain.ErrInvalidCredentials
+	if err == core.ErrNotFound {
+		return nil, core.ErrInvalidCredentials
 	}
 	
 	if err = bcrypt.CompareHashAndPassword(user.HashedPassword, []byte(input.Password)); err != nil {
-		return nil, domain.ErrInvalidCredentials
+		return nil, core.ErrInvalidCredentials
 	}
 	return user, nil
 }

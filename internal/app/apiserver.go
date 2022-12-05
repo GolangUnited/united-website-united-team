@@ -72,7 +72,7 @@ func Run() {
 		log.Fatal(err)
 	}
 	
-	handler := http.NewHandler(services, bearerAuth)
+	handler := http.NewHandler(services.Users, services.Courses, bearerAuth)
 	
 	srv := server.NewServer(cfg, handler.Init())
 	

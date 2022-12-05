@@ -2,13 +2,12 @@ package v1
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/zhuravlev-pe/course-watch/internal/core/service"
 	"github.com/zhuravlev-pe/course-watch/pkg/security"
 	"time"
 )
 
 type Handler struct {
-	services *service.Services
+	services *Services
 	bearer   BearerAuthenticator
 	//TODO: logger
 }
@@ -20,7 +19,7 @@ type BearerAuthenticator interface {
 	GetTokenTtl() time.Duration
 }
 
-func NewHandler(services *service.Services, bearer BearerAuthenticator) *Handler {
+func NewHandler(services *Services, bearer BearerAuthenticator) *Handler {
 	return &Handler{
 		services: services,
 		bearer:   bearer,

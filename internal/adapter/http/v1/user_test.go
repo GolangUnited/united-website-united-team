@@ -8,10 +8,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zhuravlev-pe/course-watch/internal/adapter/http/v1/auth"
-	"github.com/zhuravlev-pe/course-watch/internal/core/domain"
-	"github.com/zhuravlev-pe/course-watch/internal/core/dto"
-	"github.com/zhuravlev-pe/course-watch/internal/core/service"
-	serviceMocks "github.com/zhuravlev-pe/course-watch/internal/core/service/mocks"
+	serviceMocks "github.com/zhuravlev-pe/course-watch/internal/adapter/http/v1/mocks"
+	"github.com/zhuravlev-pe/course-watch/internal/core"
 	"github.com/zhuravlev-pe/course-watch/pkg/security"
 	"io"
 	"net/http"
@@ -29,7 +27,7 @@ const (
 
 var validKey = []byte("1234")
 
-var sampleUserInfo = &dto.GetUserInfoOutput{
+var sampleUserInfo = &core.GetUserInfoOutput{
 	Id:               "1582550893222432768",
 	Email:            "doe.j@example.com",
 	FirstName:        "John",
@@ -46,7 +44,7 @@ var sampleUserPrincipal = &security.UserPrincipal{
 
 type testSetup struct {
 	router          *gin.Engine
-	users           *serviceMocks.MockUsers
+	users           *serviceMocks.MockUserService
 	handler         *Handler
 	sampleUserToken string
 }
@@ -54,8 +52,8 @@ type testSetup struct {
 func getTestSetup(t *testing.T) *testSetup {
 	t.Helper()
 	mockCtrl := gomock.NewController(t)
-	mockUsers := serviceMocks.NewMockUsers(mockCtrl)
-	var s service.Services
+	mockUsers := serviceMocks.NewMockUserService(mockCtrl)
+	var s Services
 	s.Users = mockUsers
 	
 	jwt := security.NewJwtHandler(iss, aud, []string{aud}, tokenTtl, validKey)
@@ -84,13 +82,13 @@ func addAuthorizationHeader(request *http.Request, setup *testSetup) {
 
 func TestGetUserInfo(t *testing.T) {
 	cases := map[string]struct {
-		setupMocks     func(ctx context.Context, mockUsers *serviceMocks.MockUsers)
+		setupMocks     func(ctx context.Context, mockUsers *serviceMocks.MockUserService)
 		prepareRequest func(request *http.Request, setup *testSetup)
 		responseCode   int
 		responseBody   string
 	}{
 		"success": {
-			setupMocks: func(ctx context.Context, mockUsers *serviceMocks.MockUsers) {
+			setupMocks: func(ctx context.Context, mockUsers *serviceMocks.MockUserService) {
 				mockUsers.EXPECT().GetUserInfo(ctx, sampleUserPrincipal.UserId).Return(sampleUserInfo, nil).Times(1)
 			},
 			prepareRequest: addAuthorizationHeader,
@@ -98,15 +96,15 @@ func TestGetUserInfo(t *testing.T) {
 			responseBody:   `{"id":"1582550893222432768","email":"doe.j@example.com","first_name":"John","last_name":"Doe","display_name":"JonnyD","registration_date":"2017-07-21T17:32:28Z","roles":["student"]}`,
 		},
 		"not_found": {
-			setupMocks: func(ctx context.Context, mockUsers *serviceMocks.MockUsers) {
-				mockUsers.EXPECT().GetUserInfo(ctx, sampleUserPrincipal.UserId).Return(nil, domain.ErrNotFound).Times(1)
+			setupMocks: func(ctx context.Context, mockUsers *serviceMocks.MockUserService) {
+				mockUsers.EXPECT().GetUserInfo(ctx, sampleUserPrincipal.UserId).Return(nil, core.ErrNotFound).Times(1)
 			},
 			prepareRequest: addAuthorizationHeader,
 			responseCode:   http.StatusNotFound,
 			responseBody:   `{"title":"not found","status":404}`,
 		},
 		"internal_server_err": {
-			setupMocks: func(ctx context.Context, mockUsers *serviceMocks.MockUsers) {
+			setupMocks: func(ctx context.Context, mockUsers *serviceMocks.MockUserService) {
 				mockUsers.EXPECT().GetUserInfo(ctx, sampleUserPrincipal.UserId).Return(nil, someDatabaseError).Times(1)
 			},
 			prepareRequest: addAuthorizationHeader,
@@ -114,7 +112,7 @@ func TestGetUserInfo(t *testing.T) {
 			responseBody:   `{"title":"internal server error","status":500}`,
 		},
 		"unauthorized": {
-			setupMocks:     func(ctx context.Context, mockUsers *serviceMocks.MockUsers) {},
+			setupMocks:     func(ctx context.Context, mockUsers *serviceMocks.MockUserService) {},
 			prepareRequest: func(request *http.Request, setup *testSetup) {},
 			responseCode:   http.StatusUnauthorized,
 			responseBody:   `{"title":"Unauthorized","status":401}`,
@@ -142,15 +140,15 @@ func TestGetUserInfo(t *testing.T) {
 func TestUpdateUserInfo(t *testing.T) {
 	cases := map[string]struct {
 		requestBody    string
-		setupMocks     func(ctx context.Context, mockUsers *serviceMocks.MockUsers)
+		setupMocks     func(ctx context.Context, mockUsers *serviceMocks.MockUserService)
 		prepareRequest func(request *http.Request, setup *testSetup)
 		responseCode   int
 		responseBody   string
 	}{
 		"success": {
 			requestBody: `{"first_name":"UpdatedFirstName","last_name":"UpdatedLastName","display_name":"UpdatedDisplayName"}`,
-			setupMocks: func(ctx context.Context, mockUsers *serviceMocks.MockUsers) {
-				input := &dto.UpdateUserInfoInput{
+			setupMocks: func(ctx context.Context, mockUsers *serviceMocks.MockUserService) {
+				input := &core.UpdateUserInfoInput{
 					FirstName:   "UpdatedFirstName",
 					LastName:    "UpdatedLastName",
 					DisplayName: "UpdatedDisplayName",
@@ -163,27 +161,27 @@ func TestUpdateUserInfo(t *testing.T) {
 		},
 		"empty_body": {
 			requestBody:    "",
-			setupMocks:     func(ctx context.Context, mockUsers *serviceMocks.MockUsers) {},
+			setupMocks:     func(ctx context.Context, mockUsers *serviceMocks.MockUserService) {},
 			prepareRequest: addAuthorizationHeader,
 			responseCode:   http.StatusBadRequest,
 			responseBody:   `{"title":"body is missing or invalid","status":400}`,
 		},
 		"invalid_json": {
 			requestBody:    "not a valid json",
-			setupMocks:     func(ctx context.Context, mockUsers *serviceMocks.MockUsers) {},
+			setupMocks:     func(ctx context.Context, mockUsers *serviceMocks.MockUserService) {},
 			prepareRequest: addAuthorizationHeader,
 			responseCode:   http.StatusBadRequest,
 			responseBody:   `{"title":"body is missing or invalid","status":400}`,
 		},
 		"not_found": {
 			requestBody: `{"first_name":"UpdatedFirstName","last_name":"UpdatedLastName","display_name":"UpdatedDisplayName"}`,
-			setupMocks: func(ctx context.Context, mockUsers *serviceMocks.MockUsers) {
-				input := &dto.UpdateUserInfoInput{
+			setupMocks: func(ctx context.Context, mockUsers *serviceMocks.MockUserService) {
+				input := &core.UpdateUserInfoInput{
 					FirstName:   "UpdatedFirstName",
 					LastName:    "UpdatedLastName",
 					DisplayName: "UpdatedDisplayName",
 				}
-				mockUsers.EXPECT().UpdateUserInfo(ctx, sampleUserPrincipal.UserId, input).Return(domain.ErrNotFound).Times(1)
+				mockUsers.EXPECT().UpdateUserInfo(ctx, sampleUserPrincipal.UserId, input).Return(core.ErrNotFound).Times(1)
 			},
 			prepareRequest: addAuthorizationHeader,
 			responseCode:   http.StatusNotFound,
@@ -191,8 +189,8 @@ func TestUpdateUserInfo(t *testing.T) {
 		},
 		"internal_server_err": {
 			requestBody: `{"first_name":"UpdatedFirstName","last_name":"UpdatedLastName","display_name":"UpdatedDisplayName"}`,
-			setupMocks: func(ctx context.Context, mockUsers *serviceMocks.MockUsers) {
-				input := &dto.UpdateUserInfoInput{
+			setupMocks: func(ctx context.Context, mockUsers *serviceMocks.MockUserService) {
+				input := &core.UpdateUserInfoInput{
 					FirstName:   "UpdatedFirstName",
 					LastName:    "UpdatedLastName",
 					DisplayName: "UpdatedDisplayName",
@@ -205,15 +203,15 @@ func TestUpdateUserInfo(t *testing.T) {
 		},
 		"unauthorized": {
 			requestBody:    `{"first_name":"UpdatedFirstName","last_name":"UpdatedLastName","display_name":"UpdatedDisplayName"}`,
-			setupMocks:     func(ctx context.Context, mockUsers *serviceMocks.MockUsers) {},
+			setupMocks:     func(ctx context.Context, mockUsers *serviceMocks.MockUserService) {},
 			prepareRequest: func(request *http.Request, setup *testSetup) {},
 			responseCode:   http.StatusUnauthorized,
 			responseBody:   `{"title":"Unauthorized","status":401}`,
 		},
 		"validation_failure": {
 			requestBody: `{"last_name":"UpdatedLastName","display_name":"UpdatedDisplayName"}`,
-			setupMocks: func(ctx context.Context, mockUsers *serviceMocks.MockUsers) {
-				input := &dto.UpdateUserInfoInput{
+			setupMocks: func(ctx context.Context, mockUsers *serviceMocks.MockUserService) {
+				input := &core.UpdateUserInfoInput{
 					LastName:    "UpdatedLastName",
 					DisplayName: "UpdatedDisplayName",
 				}

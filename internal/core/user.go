@@ -1,10 +1,21 @@
-package dto
+package core
 
 import (
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/zhuravlev-pe/course-watch/pkg/security"
 	"time"
 )
+
+type User struct {
+	Id               string
+	Email            string
+	FirstName        string
+	LastName         string
+	DisplayName      string
+	RegistrationDate time.Time
+	HashedPassword   []byte
+	Roles            []security.Role
+}
 
 type SignupUserInput struct {
 	Email       string `json:"email"`
