@@ -43,8 +43,9 @@ func injectHandler(ctx context.Context, cfg *config.Config) (*http.Handler, func
 		cleanup()
 		return nil, nil, err
 	}
-	handler := http.NewHandler(userService, courseService, bearerAuthenticator)
-	return handler, func() {
+	handler := v1.NewHandler(userService, courseService, bearerAuthenticator)
+	httpHandler := http.NewHandler(handler)
+	return httpHandler, func() {
 		cleanup()
 	}, nil
 }

@@ -39,6 +39,7 @@ var coursesServiceSet = wire.NewSet(
 
 func injectHandler(ctx context.Context, cfg *config.Config) (*httpAdapter.Handler, func(), error) {
 	wire.Build(commonSet, createPgClient, createAuthenticator, repoSet, usersServiceSet, coursesServiceSet,
+		httpV1.NewHandler,
 		httpAdapter.NewHandler,
 	)
 	return nil, nil, nil

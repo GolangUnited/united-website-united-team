@@ -53,19 +53,17 @@ func getTestSetup(t *testing.T) *testSetup {
 	t.Helper()
 	mockCtrl := gomock.NewController(t)
 	mockUsers := serviceMocks.NewMockUserService(mockCtrl)
-	var s Services
-	s.Users = mockUsers
-	
+
 	jwt := security.NewJwtHandler(iss, aud, []string{aud}, tokenTtl, validKey)
 	bearer := auth.NewBearerAuthenticator(jwt)
 	token, err := bearer.GenerateToken(sampleUserPrincipal)
 	require.NoError(t, err)
-	
-	handler := NewHandler(&s, bearer)
-	
+
+	handler := NewHandler(mockUsers, nil, bearer)
+
 	router := gin.New()
 	handler.Init(router.Group("/api"))
-	
+
 	return &testSetup{
 		router:          router,
 		users:           mockUsers,
@@ -118,19 +116,19 @@ func TestGetUserInfo(t *testing.T) {
 			responseBody:   `{"title":"Unauthorized","status":401}`,
 		},
 	}
-	
+
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			setup := getTestSetup(t)
 			ctx := context.Background()
 			tc.setupMocks(ctx, setup.users)
-			
+
 			request := httptest.NewRequest(http.MethodGet, "/api/v1/user", nil)
 			tc.prepareRequest(request, setup)
 			rec := httptest.NewRecorder()
-			
+
 			setup.router.ServeHTTP(rec, request)
-			
+
 			assert.Equal(t, tc.responseCode, rec.Code)
 			assert.Equal(t, tc.responseBody, rec.Body.String())
 		})
@@ -223,7 +221,7 @@ func TestUpdateUserInfo(t *testing.T) {
 			responseBody:   `{"title":"invalid request parameters","status":400,"validation_errors":{"first_name":"cannot be blank"}}`,
 		},
 	}
-	
+
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			setup := getTestSetup(t)
@@ -233,13 +231,13 @@ func TestUpdateUserInfo(t *testing.T) {
 			if tc.requestBody != "" {
 				body = strings.NewReader(tc.requestBody)
 			}
-			
+
 			request := httptest.NewRequest(http.MethodPut, "/api/v1/user", body)
 			tc.prepareRequest(request, setup)
 			rec := httptest.NewRecorder()
-			
+
 			setup.router.ServeHTTP(rec, request)
-			
+
 			assert.Equal(t, tc.responseCode, rec.Code)
 			assert.Equal(t, tc.responseBody, rec.Body.String())
 		})
