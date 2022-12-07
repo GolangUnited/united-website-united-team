@@ -2,11 +2,10 @@ package app
 
 import (
 	"context"
+	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/joho/godotenv/autoload"
-	"github.com/zhuravlev-pe/course-watch/internal/adapter/http"
 	httpV1 "github.com/zhuravlev-pe/course-watch/internal/adapter/http/v1"
 	"github.com/zhuravlev-pe/course-watch/internal/adapter/http/v1/auth"
-	"github.com/zhuravlev-pe/course-watch/internal/adapter/repository"
 	"github.com/zhuravlev-pe/course-watch/internal/app/config"
 	"github.com/zhuravlev-pe/course-watch/internal/app/server"
 	"github.com/zhuravlev-pe/course-watch/internal/core/service"
@@ -39,12 +38,29 @@ func Run() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	
-	idGen, err := idgen.New(cfg.SnowflakeNode)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	handler, cleanup, err := injectHandler(ctx, cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
-	
+	defer cleanup()
+
+	srv := server.NewServer(cfg, handler.Init())
+
+	log.Print("Starting server")
+	if err = srv.Run(); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func createIdGen(cfg *config.Config) (service.IdGenerator, error) {
+	return idgen.New(cfg.SnowflakeNode)
+}
+
+func createPgClient(cfg *config.Config, ctx context.Context) (*pgxpool.Pool, func(), error) {
 	pgConfig := postgres.NewPgConfig(
 		cfg.Postgres.User,
 		cfg.Postgres.Password,
@@ -52,34 +68,11 @@ func Run() {
 		cfg.Postgres.Port,
 		cfg.Postgres.Database,
 	)
-	
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	
 	pgClient, err := postgres.NewClient(ctx, pgConfig)
 	if err != nil {
-		log.Fatal(err)
+		return nil, nil, err
 	}
-	defer pgClient.Close()
-	
-	services := service.NewServices(service.Deps{
-		Repos: repository.NewRepositories(pgClient),
-		IdGen: idGen,
-	})
-	
-	bearerAuth, err := createAuthenticator(cfg)
-	if err != nil {
-		log.Fatal(err)
-	}
-	
-	handler := http.NewHandler(services.Users, services.Courses, bearerAuth)
-	
-	srv := server.NewServer(cfg, handler.Init())
-	
-	log.Print("Starting server")
-	if err = srv.Run(); err != nil {
-		log.Fatal(err)
-	}
+	return pgClient, pgClient.Close, nil
 }
 
 func createAuthenticator(cfg *config.Config) (httpV1.BearerAuthenticator, error) {

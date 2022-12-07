@@ -6,10 +6,10 @@ package mock_service
 
 import (
 	context "context"
-	"github.com/zhuravlev-pe/course-watch/internal/core"
 	reflect "reflect"
-	
+
 	gomock "github.com/golang/mock/gomock"
+	core "github.com/zhuravlev-pe/course-watch/internal/core"
 )
 
 // MockUserService is a mock of UserService interface.
