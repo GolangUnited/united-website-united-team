@@ -1,7 +1,10 @@
 package app
 
 import (
+	"log"
+	
 	"context"
+	
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/zhuravlev-pe/course-watch/internal/adapter/http"
 	httpV1 "github.com/zhuravlev-pe/course-watch/internal/adapter/http/v1"
@@ -14,7 +17,6 @@ import (
 	"github.com/zhuravlev-pe/course-watch/pkg/keygen"
 	"github.com/zhuravlev-pe/course-watch/pkg/postgres"
 	"github.com/zhuravlev-pe/course-watch/pkg/security"
-	"log"
 )
 
 // @title Course Watch API
