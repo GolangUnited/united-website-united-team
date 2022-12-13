@@ -5,3 +5,8 @@ type Course struct {
 	Title       string
 	Description string
 }
+
+type CreateCourseInput struct {
+	Title       string
+	Description string
+}

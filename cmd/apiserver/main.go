@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/zhuravlev-pe/course-watch/internal/apiserver"
+	"github.com/zhuravlev-pe/course-watch/internal/app"
 )
 
 func main() {
-	apiserver.Run()
+	app.Run()
 }
