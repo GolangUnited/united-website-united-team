@@ -14,7 +14,7 @@ type UserService struct {
 	idGen IdGenerator
 }
 
-func NewUsersService(repo UsersRepository, idGen IdGenerator) *UserService {
+func NewUserService(repo UsersRepository, idGen IdGenerator) *UserService {
 	return &UserService{
 		repo:  repo,
 		idGen: idGen,
@@ -60,7 +60,9 @@ func (u *UserService) UpdateUserInfo(ctx context.Context, id string, input *core
 }
 
 func (u *UserService) Signup(ctx context.Context, input *core.SignupUserInput) error {
-	
+	if err := input.Validate(); err != nil {
+		return err
+	}
 	user, err := u.repo.GetByEmail(ctx, input.Email)
 	if err != nil && err != core.ErrNotFound {
 		//Any error other than ErrorNotFound should stop the Signup flow as ErrorNotFound is valid for the user Signup
@@ -75,7 +77,6 @@ func (u *UserService) Signup(ctx context.Context, input *core.SignupUserInput) e
 	if err != nil {
 		return err
 	}
-	
 	user = &core.User{
 		Id:               u.idGen.Generate(),
 		Email:            input.Email,

@@ -2,6 +2,7 @@ package core
 
 import (
 	validation "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"github.com/zhuravlev-pe/course-watch/pkg/security"
 	"time"
 )
@@ -23,6 +24,15 @@ type SignupUserInput struct {
 	FirstName   string `json:"first_name"`
 	LastName    string `json:"last_name"`
 	DisplayName string `json:"display_name"`
+}
+
+func (i *SignupUserInput) Validate() error {
+	return validation.ValidateStruct(i,
+		validation.Field(&i.Email, validation.Required, is.Email),
+		validation.Field(&i.Password, validation.Required, validation.Length(8, 20)),
+		validation.Field(&i.FirstName, validation.Required),
+		validation.Field(&i.LastName, validation.Required),
+	)
 }
 
 type LoginInput struct {
