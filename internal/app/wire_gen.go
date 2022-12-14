@@ -35,7 +35,7 @@ func injectHandler(ctx context.Context, cfg *config.Config) (*http.Handler, func
 		cleanup()
 		return nil, nil, err
 	}
-	userService := service.NewUsersService(usersRepo, idGenerator)
+	userService := service.NewUserService(usersRepo, idGenerator)
 	coursesRepository := fake_repo.NewCourses()
 	courseService := service.NewCoursesService(coursesRepository, idGenerator)
 	bearerAuthenticator, err := createAuthenticator(cfg)
@@ -59,6 +59,6 @@ var commonSet = wire.NewSet(
 
 var repoSet = wire.NewSet(repository.NewUsersRepo, wire.Bind(new(service.UsersRepository), new(*repository.UsersRepo)), fake_repo.NewCourses)
 
-var usersServiceSet = wire.NewSet(service.NewUsersService, wire.Bind(new(v1.UserService), new(*service.UserService)))
+var usersServiceSet = wire.NewSet(service.NewUserService, wire.Bind(new(v1.UserService), new(*service.UserService)))
 
 var coursesServiceSet = wire.NewSet(service.NewCoursesService, wire.Bind(new(v1.CourseService), new(*service.CourseService)))

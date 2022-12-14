@@ -10,7 +10,7 @@ The current version is built using swag v1.8.7
 
 In order to rebuild swagger files run:
 
-`swag init --parseDependency --dir internal/apiserver -g apiserver.go -o api/swagger`
+`swag init --parseDependency --dir internal/app -g apiserver.go -o api/swagger`
 
 Alternatively, use `swag` target in the Makefile
 

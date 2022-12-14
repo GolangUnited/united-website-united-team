@@ -28,7 +28,7 @@ var repoSet = wire.NewSet(
 )
 
 var usersServiceSet = wire.NewSet(
-	service.NewUsersService,
+	service.NewUserService,
 	wire.Bind(new(httpV1.UserService), new(*service.UserService)),
 )
 

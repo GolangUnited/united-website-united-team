@@ -56,6 +56,7 @@ func Run() {
 	}
 }
 
+// nolint: ireturn
 func createIdGen(cfg *config.Config) (service.IdGenerator, error) {
 	return idgen.New(cfg.SnowflakeNode)
 }
@@ -75,6 +76,7 @@ func createPgClient(cfg *config.Config, ctx context.Context) (*pgxpool.Pool, fun
 	return pgClient, pgClient.Close, nil
 }
 
+// nolint: ireturn
 func createAuthenticator(cfg *config.Config) (httpV1.BearerAuthenticator, error) {
 	// JwtHandler uses HMAC-SHA256 for signing, block size for SHA256 is 64 bytes, so the key size is the same
 	key, err := keygen.Generate(cfg.JWTAuthentication.SigningKey, "bearer-auth.key", 64)
