@@ -7,7 +7,7 @@ import (
 )
 
 type Handler struct {
-	services *Services
+	services *services
 	bearer   BearerAuthenticator
 	//TODO: logger
 }
@@ -19,10 +19,13 @@ type BearerAuthenticator interface {
 	GetTokenTtl() time.Duration
 }
 
-func NewHandler(services *Services, bearer BearerAuthenticator) *Handler {
+func NewHandler(userService UserService, courseService CourseService, bearer BearerAuthenticator) *Handler {
 	return &Handler{
-		services: services,
-		bearer:   bearer,
+		services: &services{
+			Users:   userService,
+			Courses: courseService,
+		},
+		bearer: bearer,
 	}
 }
 

@@ -10,7 +10,7 @@ The current version is built using swag v1.8.7
 
 In order to rebuild swagger files run:
 
-`swag init --parseDependency --dir internal/apiserver -g apiserver.go -o api/swagger`
+`swag init --parseDependency --dir internal/app -g apiserver.go -o api/swagger`
 
 Alternatively, use `swag` target in the Makefile
 
@@ -56,3 +56,11 @@ $ go install -tags 'pgx' github.com/golang-migrate/migrate/v4/cmd/migrate@$TAG
 *Basic usage:*
 
 `$ migrate -source file://path/to/migrations -database pgx://postgres:$env:POSTGRES_PASSWORD@localhost:6543/postgres up`
+
+### Wire
+
+[Wire](https://github.com/google/wire) is needed to regenerate `internal/app/wire_gen.go` file. The `wire` CLI tool is required for that:
+
+`go install github.com/google/wire/cmd/wire@v0.5.0`
+
+`wire` will be called automatically whenever `go generate ./...` is invoked. This will apply all changes made in `internal/app/wire.go` to `wire_gen.go`. Do not edit the latter one directly.

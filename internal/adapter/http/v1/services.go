@@ -1,6 +1,6 @@
 package v1
 
-type Services struct {
+type services struct {
 	Users   UserService
 	Courses CourseService
 }

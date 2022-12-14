@@ -22,13 +22,12 @@ func (h *Handler) handleServiceError(ctx *gin.Context, err error) {
 		utils.ErrorResponse(ctx, http.StatusNotFound, err)
 		return
 	}
-	
+
 	var validationErrors validation.Errors
 	if errors.As(err, &validationErrors) {
 		utils.ValidationErrorResponse(ctx, validationErrors)
 		return
 	}
-	
+
 	utils.ErrorResponseMessageOverride(ctx, http.StatusInternalServerError, err, "internal server error")
-	return
 }
